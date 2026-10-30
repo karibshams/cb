@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery - On The Go | Operations Intelligence & Capacity Allocation Dashboard</title>
+  <script src="assets/tailwind.min.js"></script>
+  <script src="assets/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+    .glass-card-hover:hover { border-color: rgba(99, 102, 241, 0.4); transform: translateY(-2px); transition: all 0.2s ease; }
+    .tab-active { background-color: #4F46E5; color: #FFFFFF; font-weight: 600; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); }
+    .tab-inactive { background-color: rgba(30, 41, 59, 0.6); color: #94A3B8; }
+    .tab-inactive:hover { background-color: rgba(51, 65, 85, 0.8); color: #F8FAFC; }
+    .badge-overload { background-color: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-donor { background-color: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-balanced { background-color: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-indigo-500/30">
+            D
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              Delivery - On The Go
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-medium border border-indigo-500/30">Operations Intelligence</span>
+            </h1>
+            <p class="text-xs text-slate-400">Metro City 6-Hub Diagnostic Audit & Strategic Resource Allocation</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="text-right text-xs text-slate-400 hidden sm:block">
+          <div><span class="text-indigo-400 font-semibold">Karib Shams</span> <span class="text-slate-500">| 01797470717 | shams321karib@gmail.com</span></div>
+          <div><span class="text-slate-500">Historical Audit:</span> 13–26 Oct 2026 &nbsp;|&nbsp; <span class="text-slate-500">Forecast:</span> 27 Oct – 23 Nov 2026</div>
+        </div>
+        <button onclick="window.print()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Export View / PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+    <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/60 rounded-xl border border-slate-800">
+      <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="tab-btn px-4 py-2.5 rounded-lg text-xs md:text-sm transition tab-inactive">1. Executive Overview</button>\n      <button onclick="switchTab('tab-utilisation')" id="btn-tab-utilisation" class="tab-btn px-4 py-2.5 rounded-lg text-xs md:text-sm transition tab-inactive">2. Hub Utilisation & Forecast Gap</button>\n      <button onclick="switchTab('tab-holds')" id="btn-tab-holds" class="tab-btn px-4 py-2.5 rounded-lg text-xs md:text-sm transition tab-active">3. Hold Reasons & Root Cause</button>\n      <button onclick="switchTab('tab-agents')" id="btn-tab-agents" class="tab-btn px-4 py-2.5 rounded-lg text-xs md:text-sm transition tab-inactive">4. Productivity & Return Watchlist</button>\n      <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn px-4 py-2.5 rounded-lg text-xs md:text-sm transition tab-inactive">5. Strategic Plan & BDT 70k Budget</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-8">
+
+    <!-- TAB 1: EXECUTIVE OVERVIEW -->
+    <div id="tab-overview" class="tab-content hidden space-y-6">
+      
+      <!-- EXECUTIVE ALERT BANNER -->
+      <div class="glass-card p-5 border-l-4 border-l-amber-500 bg-gradient-to-r from-amber-950/20 to-slate-900/60">
+        <div class="flex items-start justify-between flex-col md:flex-row gap-4">
+          <div>
+            <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+              Executive Diagnostic Assessment: Reject Blanket Hiring Request of 8 Agents
+            </h3>
+            <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-4xl leading-relaxed">
+              While Week 2 attempts rose +21.9% citywide, only 3 hubs are overloaded: <strong class="text-rose-400">Greenfield (88.6%)</strong>, <strong class="text-rose-400">Riverside (90.8%)</strong>, and <strong class="text-rose-400">Hillcrest (95.9%)</strong>. Crucially, Riverside’s volume is artificial—driven by <strong class="text-amber-300">563 avoidable agent-side holds</strong>. Greenfield can be solved via intra-cluster transfer from Lakeview (56.2% util). A blanket hiring of 8 agents would cost <strong class="text-rose-400">BDT 175,200</strong> (blowing the BDT 70k budget by 2.5x). Our data-backed strategy solves all gaps for <strong class="text-emerald-400">BDT 65,698</strong> with <strong class="text-emerald-400">+153.9% Net ROI</strong>.
+            </p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
+            Budget Compliant (BDT 65,698 / 70,000)
+          </span>
+        </div>
+      </div>
+
+      <!-- METRIC CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="glass-card p-4 glass-card-hover">
+          <div class="text-slate-400 text-xs font-medium">Total Orders Handled</div>
+          <div class="text-2xl font-bold text-white mt-1">22,789</div>
+          <div class="text-[11px] text-slate-400 mt-1">100% orders logged</div>
+        </div>
+        <div class="glass-card p-4 glass-card-hover">
+          <div class="text-slate-400 text-xs font-medium">Delivered Orders</div>
+          <div class="text-2xl font-bold text-emerald-400 mt-1">21,078</div>
+          <div class="text-[11px] text-emerald-400 mt-1">92.5% Success Rate</div>
+        </div>
+        <div class="glass-card p-4 glass-card-hover">
+          <div class="text-slate-400 text-xs font-medium">Total Holds Incurred</div>
+          <div class="text-2xl font-bold text-amber-400 mt-1">3,042</div>
+          <div class="text-[11px] text-amber-400 mt-1">BDT 91,260 in Penalties</div>
+        </div>
+        <div class="glass-card p-4 glass-card-hover">
+          <div class="text-slate-400 text-xs font-medium">Total Returns Logged</div>
+          <div class="text-2xl font-bold text-rose-400 mt-1">1,475</div>
+          <div class="text-[11px] text-rose-400 mt-1">BDT 81,125 in Penalties</div>
+        </div>
+        <div class="glass-card p-4 glass-card-hover">
+          <div class="text-slate-400 text-xs font-medium">Avg Cost / Delivery</div>
+          <div class="text-2xl font-bold text-indigo-400 mt-1">BDT 34.87</div>
+          <div class="text-[11px] text-slate-400 mt-1">W1: 35.25 | W2: 34.49</div>
+        </div>
+        <div class="glass-card p-4 glass-card-hover">
+          <div class="text-slate-400 text-xs font-medium">Overloaded Hubs</div>
+          <div class="text-2xl font-bold text-rose-400 mt-1">3 <span class="text-sm font-normal text-slate-400">/ 6</span></div>
+          <div class="text-[11px] text-rose-400 mt-1">H01, H03, H04 (>85%)</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 1 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h4 class="text-sm font-bold text-white">Delivery Attempt Surge: Week 1 vs Week 2</h4>
+              <p class="text-xs text-slate-400">Total attempts logged in order_logs by hub</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">Attempts Count</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chart-attempts-growth"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h4 class="text-sm font-bold text-white">Unit Economics: Cost per Delivered Order</h4>
+              <p class="text-xs text-slate-400">Labor pay + Hold (BDT 30) + Return (BDT 55) penalties</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">BDT / Delivered Order</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chart-unit-cost"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- COST BREAKDOWN TABLE -->
+      <div class="glass-card p-5">
+        <h4 class="text-sm font-bold text-white mb-2">Itemized Weekly Financial Performance (Q6 Summary)</h4>
+        <p class="text-xs text-slate-400 mb-4">All figures derived from database query matching cost_sheet parameters</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-300">
+            <thead class="bg-slate-800/80 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+              <tr>
+                <th class="p-3">Hub</th>
+                <th class="p-3">Week</th>
+                <th class="p-3 text-right">Delivered</th>
+                <th class="p-3 text-right">Attempts</th>
+                <th class="p-3 text-right">Fixed Pay</th>
+                <th class="p-3 text-right">Var Pay</th>
+                <th class="p-3 text-right">Labor Cost</th>
+                <th class="p-3 text-right">Hold Pen.</th>
+                <th class="p-3 text-right">Ret. Pen.</th>
+                <th class="p-3 text-right">Total Cost</th>
+                <th class="p-3 text-right font-bold text-white">Cost/Order</th>
+              </tr>
+            </thead>
+            <tbody id="table-q6-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- TAB 2: HUB UTILISATION & FORECAST GAP -->
+    <div id="tab-utilisation" class="tab-content hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- UTILISATION TABLE -->
+        <div class="lg:col-span-2 glass-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h4 class="text-sm font-bold text-white">Hub Utilisation Comparison: Week 1 vs Week 2 (Q2)</h4>
+              <p class="text-xs text-slate-400">Standard Workload = 40 attempts/agent/day. Planning Target = 85%.</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Target: 85%</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-300">
+              <thead class="bg-slate-800/80 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+                <tr>
+                  <th class="p-3">Hub</th>
+                  <th class="p-3">Cluster</th>
+                  <th class="p-3 text-center">W1 Agents</th>
+                  <th class="p-3 text-right">W1 Attempts</th>
+                  <th class="p-3 text-right">W1 Util.</th>
+                  <th class="p-3 text-center">W2 Agents</th>
+                  <th class="p-3 text-right">W2 Attempts</th>
+                  <th class="p-3 text-right font-bold">W2 Util.</th>
+                  <th class="p-3 text-center">Status Flag</th>
+                </tr>
+              </thead>
+              <tbody id="table-q2-body" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center gap-4 text-xs text-slate-400">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Overloaded Hub (> 85% target)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Eligible Donor Hub (< 75% rule threshold)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Balanced Hub (75% - 85%)</span>
+          </div>
+        </div>
+
+        <!-- RE-ATTEMPT MULTIPLIER EXPLAINER -->
+        <div class="glass-card p-5 flex flex-col justify-between">
+          <div>
+            <h4 class="text-sm font-bold text-white mb-2">The Attempt Multiplier Phenomenon</h4>
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+              Why do some hubs require far more attempts than expected orders? Held orders generate mandatory next-day re-attempts.
+            </p>
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-lg bg-slate-800/60 border border-slate-700/60">
+                <div class="flex justify-between font-medium">
+                  <span class="text-slate-300">Clean Hubs (H01, H02, H04, H06)</span>
+                  <span class="text-emerald-400 font-bold">1.07x Multiplier</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Normal customer unreachable/reschedule re-attempts (~7% extra workload).</p>
+              </div>
+              <div class="p-3 rounded-lg bg-rose-950/30 border border-rose-800/40">
+                <div class="flex justify-between font-medium">
+                  <span class="text-rose-300 font-bold">Riverside (H03)</span>
+                  <span class="text-rose-400 font-bold">1.35x - 1.39x Multiplier</span>
+                </div>
+                <p class="text-[11px] text-rose-300/80 mt-1">Severe hold recycling! 64.4% agent-side holds inflate attempts by +35% to +39%!</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-indigo-950/30 border border-indigo-800/40 mt-4">
+            <div class="text-[11px] text-indigo-300 font-medium">Planning Implication:</div>
+            <div class="text-xs text-slate-300 mt-0.5">Fixing H03's holds cuts ~282 attempts/wk, eliminating the need to hire 2 extra agents!</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 4-WEEK FORECAST GAP CHART & TABLE -->
+      <div class="glass-card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h4 class="text-sm font-bold text-white">4-Week Forecast: Baseline vs Adjusted Staffing Gaps (Q7)</h4>
+            <p class="text-xs text-slate-400">Comparing pure order-demand staffing vs attempt-adjusted real operational load</p>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">238 attempts / agent / week</span>
+        </div>
+        <div class="h-72 mb-6">
+          <canvas id="chart-forecast-gaps"></canvas>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-300">
+            <thead class="bg-slate-800/80 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+              <tr>
+                <th class="p-3">Hub</th>
+                <th class="p-3">Forecast Week</th>
+                <th class="p-3 text-center">Active Staff</th>
+                <th class="p-3 text-right">Expected Orders</th>
+                <th class="p-3 text-center">Baseline Req.</th>
+                <th class="p-3 text-center font-bold">Baseline Gap</th>
+                <th class="p-3 text-center">Multiplier</th>
+                <th class="p-3 text-right">Adjusted Attempts</th>
+                <th class="p-3 text-center">Adjusted Req.</th>
+                <th class="p-3 text-center font-bold text-amber-300">True Gap (Adj.)</th>
+              </tr>
+            </thead>
+            <tbody id="table-q7-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- TAB 3: HOLD REASONS & ROOT CAUSE -->
+    <div id="tab-holds" class="tab-content space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- AGENT-SIDE VS CUSTOMER-SIDE HOLDS -->
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h4 class="text-sm font-bold text-white">Week 2 Hold Classification by Hub (Q3)</h4>
+              <p class="text-xs text-slate-400">Agent-side (Late Dispatch, Not Attempted, Time Shortage) vs Customer-side</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">Week 2 Holds</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chart-holds-category"></canvas>
+          </div>
+        </div>
+
+        <!-- HELD ORDERS OUTCOME FUNNEL -->
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h4 class="text-sm font-bold text-white">What Happens to Held Orders? (Q4)</h4>
+              <p class="text-xs text-slate-400">Final status of all unique orders held at least once (2,599 orders)</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">Citywide & By Hub</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chart-held-funnel"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DEEP DIVE: RIVERSIDE (H03) HOLD BREAKDOWN -->
+      <div class="glass-card p-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+          <div>
+            <h4 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+              Root Cause Audit: Riverside (H03) Dispatch Failure (874 Holds in Week 2)
+            </h4>
+            <p class="text-xs text-slate-400">Why Riverside generated 50.8% of the entire city's Week 2 holds</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            64.42% Agent-Side Holds
+          </span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
+            <div class="text-xs text-slate-400 font-medium">1. Late Dispatch Breakdown</div>
+            <div class="text-2xl font-bold text-rose-400 mt-1">312 Holds <span class="text-xs font-normal text-slate-400">(35.7%)</span></div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+              Orders sorted and dispatched past scheduled wave cutoffs. Morning hub sorting bottleneck delayed departure.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
+            <div class="text-xs text-slate-400 font-medium">2. Not Attempted & Time Shortage</div>
+            <div class="text-2xl font-bold text-amber-400 mt-1">251 Holds <span class="text-xs font-normal text-slate-400">(28.7%)</span></div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+              132 Not Attempted + 119 Agent Time Shortage. Direct cascading consequence of late departures into evening traffic.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
+            <div class="text-xs text-slate-400 font-medium">3. Customer-Side Holds</div>
+            <div class="text-2xl font-bold text-blue-400 mt-1">311 Holds <span class="text-xs font-normal text-slate-400">(35.6%)</span></div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+              156 Customer Unreachable + 92 Rescheduled + 63 Address Incomplete. Standard external delivery friction.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- TAB 4: AGENT PRODUCTIVITY & WATCHLIST -->
+    <div id="tab-agents" class="tab-content hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- HUB AVERAGE PRODUCTIVITY -->
+        <div class="lg:col-span-2 glass-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h4 class="text-sm font-bold text-white">Hub Agent Productivity: Deliveries per Day (Q1)</h4>
+              <p class="text-xs text-slate-400">Comparing Working Agent-Days vs Available Scheduled Days</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">14-Day Average</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chart-agent-prod"></canvas>
+          </div>
+        </div>
+
+        <!-- HIGH-RETURN WATCHLIST SUMMARY -->
+        <div class="glass-card p-5 flex flex-col justify-between">
+          <div>
+            <h4 class="text-sm font-bold text-white mb-2">High-Return Agent Alert (Q5)</h4>
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+              Tenure > 30 days & Return Ratio > 15%. All 3 qualified agents belong to <strong class="text-amber-300">Brookside (H05)</strong>.
+            </p>
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-lg bg-rose-950/30 border border-rose-800/40">
+                <div class="font-bold text-rose-300">56.2% of H05 Returns</div>
+                <p class="text-[11px] text-slate-300 mt-1">
+                  Just 3 agents (A1045, A1046, A1047) generated 257 out of H05's 457 total returns!
+                </p>
+              </div>
+              <div class="p-3 rounded-lg bg-slate-800/60 border border-slate-700/60">
+                <div class="font-bold text-slate-200">Financial Impact</div>
+                <p class="text-[11px] text-slate-300 mt-1">
+                  Costing BDT 14,135 in return penalties (257 * BDT 55). Retraining solves this at near-zero cost.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-emerald-950/30 border border-emerald-800/40 mt-4">
+            <div class="text-[11px] text-emerald-300 font-medium">Exclusion Audit:</div>
+            <div class="text-xs text-slate-300 mt-0.5">Agent A1050 (Orel Pelham) had 22.8% returns but tenure was only 20 days (exempt).</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HIGH RETURN AGENTS DETAIL TABLE -->
+      <div class="glass-card p-5">
+        <h4 class="text-sm font-bold text-white mb-2">High-Return Agents Watchlist (Q5 Output)</h4>
+        <p class="text-xs text-slate-400 mb-4">Criteria: Tenure > 30 days on Oct 26, 2026 AND Return Ratio > 15.0%</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-300">
+            <thead class="bg-slate-800/80 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+              <tr>
+                <th class="p-3">Agent ID</th>
+                <th class="p-3">Agent Name</th>
+                <th class="p-3">Hub</th>
+                <th class="p-3">Joining Date</th>
+                <th class="p-3 text-center">Tenure (Days)</th>
+                <th class="p-3 text-center">Salary Type</th>
+                <th class="p-3 text-right">Assigned</th>
+                <th class="p-3 text-right">Delivered</th>
+                <th class="p-3 text-right">Holds</th>
+                <th class="p-3 text-right">Returns</th>
+                <th class="p-3 text-right font-bold text-rose-400">Return Ratio (%)</th>
+                <th class="p-3">Recommended Operational Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-q5-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- TAB 5: STRATEGIC PLAN & BDT 70K BUDGET -->
+    <div id="tab-strategy" class="tab-content hidden space-y-6">
+      
+      <!-- BUDGET OVERVIEW CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="glass-card p-4">
+          <div class="text-slate-400 text-xs font-medium">Finance Release Limit</div>
+          <div class="text-2xl font-bold text-white mt-1">BDT 70,000</div>
+          <div class="text-[11px] text-slate-400 mt-1">Strict monthly envelope</div>
+        </div>
+        <div class="glass-card p-4">
+          <div class="text-slate-400 text-xs font-medium">Optimal Allocated Spend</div>
+          <div class="text-2xl font-bold text-emerald-400 mt-1">BDT 65,698</div>
+          <div class="text-[11px] text-emerald-400 mt-1">Covers all fees & 1-mo salaries</div>
+        </div>
+        <div class="glass-card p-4">
+          <div class="text-slate-400 text-xs font-medium">Contingency Buffer</div>
+          <div class="text-2xl font-bold text-indigo-400 mt-1">BDT 4,302</div>
+          <div class="text-[11px] text-indigo-400 mt-1">Unallocated reserve buffer</div>
+        </div>
+        <div class="glass-card p-4">
+          <div class="text-slate-400 text-xs font-medium">Projected 30-Day Net ROI</div>
+          <div class="text-2xl font-bold text-emerald-400 mt-1">+153.9%</div>
+          <div class="text-[11px] text-emerald-400 mt-1">BDT 166.8k benefits generated</div>
+        </div>
+      </div>
+
+      <!-- BUDGET ALLOCATION TABLE & DONUT CHART -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 glass-card p-5">
+          <h4 class="text-sm font-bold text-white mb-2">Itemized BDT 70,000 Budget Allocation (Q9)</h4>
+          <p class="text-xs text-slate-400 mb-4">Complete breakdown covering one-time investments, recruitment, and full month-1 payroll</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-300">
+              <thead class="bg-slate-800/80 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+                <tr>
+                  <th class="p-3">Program / Expenditure Item</th>
+                  <th class="p-3">Category</th>
+                  <th class="p-3 text-center">Units</th>
+                  <th class="p-3 text-right">Unit Cost</th>
+                  <th class="p-3 text-right font-bold text-white">Total (BDT)</th>
+                  <th class="p-3">Strategic Impact</th>
+                </tr>
+              </thead>
+              <tbody id="table-q9-body" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 flex flex-col justify-between">
+          <div>
+            <h4 class="text-sm font-bold text-white mb-2">Budget Capital Distribution</h4>
+            <p class="text-xs text-slate-400 mb-4">Allocation by expenditure category</p>
+            <div class="h-56">
+              <canvas id="chart-budget-donut"></canvas>
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-800/60 border border-slate-700/60 mt-4 text-xs">
+            <div class="font-bold text-slate-200">Financial Payback:</div>
+            <div class="text-[11px] text-slate-400 mt-1">
+              Direct penalty savings at H03 (BDT 27,060) + H05 (BDT 8,635) = BDT 35,695, recovering 54.3% of total outlay in Month 1 alone!
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- EARLY WARNING SYSTEM TABLE -->
+      <div class="glass-card p-5">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-sm font-bold text-white">Operational Early-Warning System (Q10)</h4>
+          <span class="text-xs px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Week 1 & 2 Triggers</span>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Concrete numerical thresholds and automated management response protocols</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-300">
+            <thead class="bg-slate-800/80 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+              <tr>
+                <th class="p-3">Risk Category</th>
+                <th class="p-3">Specific Operational Vulnerability</th>
+                <th class="p-3">Monitored KPI</th>
+                <th class="p-3 text-amber-400">Week 1 Trigger</th>
+                <th class="p-3 text-rose-400">Week 2 Trigger</th>
+                <th class="p-3">Mandated Mitigation Protocol</th>
+              </tr>
+            </thead>
+            <tbody id="table-q10-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- EMBEDDED DASHBOARD DATA & SCRIPT -->
+  <script>
+    const DASHBOARD_DATA = {"q1_hub": [{"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "total_available_agent_days": 147, "total_working_agent_days": 144, "total_assigned_attempts": 4407, "total_delivered_orders": 3908, "total_hold_orders": 327, "total_returned_orders": 172, "avg_deliveries_per_available_day": 26.59, "avg_deliveries_per_working_day": 27.14}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "total_available_agent_days": 154, "total_working_agent_days": 149, "total_assigned_attempts": 3377, "total_delivered_orders": 3001, "total_hold_orders": 244, "total_returned_orders": 132, "avg_deliveries_per_available_day": 19.49, "avg_deliveries_per_working_day": 20.14}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "total_available_agent_days": 168, "total_working_agent_days": 165, "total_assigned_attempts": 5332, "total_delivered_orders": 3479, "total_hold_orders": 1501, "total_returned_orders": 352, "avg_deliveries_per_available_day": 20.71, "avg_deliveries_per_working_day": 21.08}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "total_available_agent_days": 126, "total_working_agent_days": 123, "total_assigned_attempts": 4359, "total_delivered_orders": 3798, "total_hold_orders": 343, "total_returned_orders": 218, "avg_deliveries_per_available_day": 30.14, "avg_deliveries_per_working_day": 30.88}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "total_available_agent_days": 154, "total_working_agent_days": 147, "total_assigned_attempts": 4225, "total_delivered_orders": 3411, "total_hold_orders": 357, "total_returned_orders": 457, "avg_deliveries_per_available_day": 22.15, "avg_deliveries_per_working_day": 23.2}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "total_available_agent_days": 133, "total_working_agent_days": 126, "total_assigned_attempts": 3895, "total_delivered_orders": 3481, "total_hold_orders": 270, "total_returned_orders": 144, "avg_deliveries_per_available_day": 26.17, "avg_deliveries_per_working_day": 27.63}], "q2": [{"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "w1_available_agents": 11, "w1_working_days": 75, "w1_total_attempts": 1925, "w1_planned_utilisation": 0.625, "w1_worked_utilisation": 0.6417, "w2_available_agents": 10, "w2_working_days": 69, "w2_total_attempts": 2482, "w2_planned_utilisation": 0.8864, "w2_worked_utilisation": 0.8993, "attempt_growth_pct": 28.94, "w2_over_target_flag": "YES (Overloaded > 85%)"}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "w1_available_agents": 11, "w1_working_days": 74, "w1_total_attempts": 1647, "w1_planned_utilisation": 0.5347, "w1_worked_utilisation": 0.5564, "w2_available_agents": 11, "w2_working_days": 75, "w2_total_attempts": 1730, "w2_planned_utilisation": 0.5617, "w2_worked_utilisation": 0.5767, "attempt_growth_pct": 5.04, "w2_over_target_flag": "NO (Within Target)"}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "w1_available_agents": 12, "w1_working_days": 83, "w1_total_attempts": 2281, "w1_planned_utilisation": 0.6789, "w1_worked_utilisation": 0.687, "w2_available_agents": 12, "w2_working_days": 82, "w2_total_attempts": 3051, "w2_planned_utilisation": 0.908, "w2_worked_utilisation": 0.9302, "attempt_growth_pct": 33.76, "w2_over_target_flag": "YES (Overloaded > 85%)"}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "w1_available_agents": 9, "w1_working_days": 62, "w1_total_attempts": 1943, "w1_planned_utilisation": 0.771, "w1_worked_utilisation": 0.7835, "w2_available_agents": 9, "w2_working_days": 61, "w2_total_attempts": 2416, "w2_planned_utilisation": 0.9587, "w2_worked_utilisation": 0.9902, "attempt_growth_pct": 24.34, "w2_over_target_flag": "YES (Overloaded > 85%)"}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "w1_available_agents": 11, "w1_working_days": 72, "w1_total_attempts": 2023, "w1_planned_utilisation": 0.6568, "w1_worked_utilisation": 0.7024, "w2_available_agents": 11, "w2_working_days": 75, "w2_total_attempts": 2202, "w2_planned_utilisation": 0.7149, "w2_worked_utilisation": 0.734, "attempt_growth_pct": 8.85, "w2_over_target_flag": "NO (Within Target)"}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "w1_available_agents": 10, "w1_working_days": 67, "w1_total_attempts": 1870, "w1_planned_utilisation": 0.6679, "w1_worked_utilisation": 0.6978, "w2_available_agents": 9, "w2_working_days": 59, "w2_total_attempts": 2025, "w2_planned_utilisation": 0.8036, "w2_worked_utilisation": 0.8581, "attempt_growth_pct": 8.29, "w2_over_target_flag": "NO (Within Target)"}], "q3": [{"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "total_w2_holds": 168, "agent_side_holds": 32, "customer_side_holds": 136, "agent_side_share_pct": 19.05, "top_reason_1": "Customer Unreachable", "top_reason_1_count": 73, "top_reason_1_pct": 43.45, "top_reason_2": "Customer Rescheduled", "top_reason_2_count": 35, "top_reason_2_pct": 20.83}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "total_w2_holds": 123, "agent_side_holds": 26, "customer_side_holds": 97, "agent_side_share_pct": 21.14, "top_reason_1": "Customer Unreachable", "top_reason_1_count": 50, "top_reason_1_pct": 40.65, "top_reason_2": "Customer Rescheduled", "top_reason_2_count": 25, "top_reason_2_pct": 20.33}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "total_w2_holds": 874, "agent_side_holds": 563, "customer_side_holds": 311, "agent_side_share_pct": 64.42, "top_reason_1": "Late Dispatch", "top_reason_1_count": 312, "top_reason_1_pct": 35.7, "top_reason_2": "Customer Unreachable", "top_reason_2_count": 156, "top_reason_2_pct": 17.85}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "total_w2_holds": 182, "agent_side_holds": 40, "customer_side_holds": 142, "agent_side_share_pct": 21.98, "top_reason_1": "Customer Unreachable", "top_reason_1_count": 77, "top_reason_1_pct": 42.31, "top_reason_2": "Customer Rescheduled", "top_reason_2_count": 39, "top_reason_2_pct": 21.43}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "total_w2_holds": 186, "agent_side_holds": 49, "customer_side_holds": 137, "agent_side_share_pct": 26.34, "top_reason_1": "Customer Unreachable", "top_reason_1_count": 68, "top_reason_1_pct": 36.56, "top_reason_2": "Customer Rescheduled", "top_reason_2_count": 43, "top_reason_2_pct": 23.12}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "total_w2_holds": 146, "agent_side_holds": 30, "customer_side_holds": 116, "agent_side_share_pct": 20.55, "top_reason_1": "Customer Unreachable", "top_reason_1_count": 66, "top_reason_1_pct": 45.21, "top_reason_2": "Customer Rescheduled", "top_reason_2_count": 28, "top_reason_2_pct": 19.18}], "q4": [{"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "total_held_orders": 303, "finally_delivered": 269, "delivered_pct": 88.78, "finally_returned": 8, "returned_pct": 2.64, "still_on_hold": 26, "still_on_hold_pct": 8.58}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "total_held_orders": 228, "finally_delivered": 204, "delivered_pct": 89.47, "finally_returned": 10, "returned_pct": 4.39, "still_on_hold": 14, "still_on_hold_pct": 6.14}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "total_held_orders": 1184, "finally_delivered": 903, "delivered_pct": 76.27, "finally_returned": 165, "returned_pct": 13.94, "still_on_hold": 116, "still_on_hold_pct": 9.8}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "total_held_orders": 316, "finally_delivered": 272, "delivered_pct": 86.08, "finally_returned": 15, "returned_pct": 4.75, "still_on_hold": 29, "still_on_hold_pct": 9.18}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "total_held_orders": 324, "finally_delivered": 260, "delivered_pct": 80.25, "finally_returned": 37, "returned_pct": 11.42, "still_on_hold": 27, "still_on_hold_pct": 8.33}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "total_held_orders": 244, "finally_delivered": 210, "delivered_pct": 86.07, "finally_returned": 10, "returned_pct": 4.1, "still_on_hold": 24, "still_on_hold_pct": 9.84}], "q5": [{"agent_id": "A1045", "agent_name": "Belis Rowntree", "hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "joining_date": "2025-07-20", "tenure_days": 463, "salary_type": "Variable", "active_status": "Active", "assigned_attempts": 349, "delivered_orders": 231, "hold_orders": 24, "returned_orders": 94, "return_ratio_pct": 26.93, "return_ratio_completed_pct": 28.92}, {"agent_id": "A1046", "agent_name": "Coris Halvorsen", "hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "joining_date": "2025-01-17", "tenure_days": 647, "salary_type": "Fixed", "active_status": "Active", "assigned_attempts": 414, "delivered_orders": 295, "hold_orders": 28, "returned_orders": 91, "return_ratio_pct": 21.98, "return_ratio_completed_pct": 23.58}, {"agent_id": "A1047", "agent_name": "Wenian Vantell", "hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "joining_date": "2025-05-18", "tenure_days": 526, "salary_type": "Variable", "active_status": "Active", "assigned_attempts": 413, "delivered_orders": 301, "hold_orders": 40, "returned_orders": 72, "return_ratio_pct": 17.43, "return_ratio_completed_pct": 19.3}], "q6": [{"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "week_label": "Week 1", "total_delivered": 1698, "total_attempts": 1925, "total_holds": 159, "total_returns": 68, "fixed_agent_pay": 31200.0, "var_agent_daily_pay": 8100.0, "var_agent_delivery_pay": 8358.0, "total_labor_cost": 47658.0, "total_hold_penalties": 4770.0, "total_return_penalties": 3740.0, "total_penalty_cost": 8510.0, "total_operating_cost": 56168.0, "cost_per_delivered_order": 33.08}, {"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "week_label": "Week 2", "total_delivered": 2210, "total_attempts": 2482, "total_holds": 168, "total_returns": 104, "fixed_agent_pay": 27300.0, "var_agent_daily_pay": 8100.0, "var_agent_delivery_pay": 12544.0, "total_labor_cost": 47944.0, "total_hold_penalties": 5040.0, "total_return_penalties": 5720.0, "total_penalty_cost": 10760.0, "total_operating_cost": 58704.0, "cost_per_delivered_order": 26.56}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "week_label": "Week 1", "total_delivered": 1469, "total_attempts": 1647, "total_holds": 121, "total_returns": 57, "fixed_agent_pay": 35100.0, "var_agent_daily_pay": 6000.0, "var_agent_delivery_pay": 5628.0, "total_labor_cost": 46728.0, "total_hold_penalties": 3630.0, "total_return_penalties": 3135.0, "total_penalty_cost": 6765.0, "total_operating_cost": 53493.0, "cost_per_delivered_order": 36.41}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "week_label": "Week 2", "total_delivered": 1532, "total_attempts": 1730, "total_holds": 123, "total_returns": 75, "fixed_agent_pay": 35100.0, "var_agent_daily_pay": 6300.0, "var_agent_delivery_pay": 6188.0, "total_labor_cost": 47588.0, "total_hold_penalties": 3690.0, "total_return_penalties": 4125.0, "total_penalty_cost": 7815.0, "total_operating_cost": 55403.0, "cost_per_delivered_order": 36.16}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "week_label": "Week 1", "total_delivered": 1498, "total_attempts": 2281, "total_holds": 627, "total_returns": 156, "fixed_agent_pay": 36400.0, "var_agent_daily_pay": 8100.0, "var_agent_delivery_pay": 6538.0, "total_labor_cost": 51038.0, "total_hold_penalties": 18810.0, "total_return_penalties": 8580.0, "total_penalty_cost": 27390.0, "total_operating_cost": 78428.0, "cost_per_delivered_order": 52.36}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "week_label": "Week 2", "total_delivered": 1981, "total_attempts": 3051, "total_holds": 874, "total_returns": 196, "fixed_agent_pay": 35100.0, "var_agent_daily_pay": 8400.0, "var_agent_delivery_pay": 9982.0, "total_labor_cost": 53482.0, "total_hold_penalties": 26220.0, "total_return_penalties": 10780.0, "total_penalty_cost": 37000.0, "total_operating_cost": 90482.0, "cost_per_delivered_order": 45.67}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "week_label": "Week 1", "total_delivered": 1687, "total_attempts": 1943, "total_holds": 161, "total_returns": 95, "fixed_agent_pay": 9100.0, "var_agent_daily_pay": 14400.0, "var_agent_delivery_pay": 18396.0, "total_labor_cost": 41896.0, "total_hold_penalties": 4830.0, "total_return_penalties": 5225.0, "total_penalty_cost": 10055.0, "total_operating_cost": 51951.0, "cost_per_delivered_order": 30.79}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "week_label": "Week 2", "total_delivered": 2111, "total_attempts": 2416, "total_holds": 182, "total_returns": 123, "fixed_agent_pay": 8450.0, "var_agent_daily_pay": 14400.0, "var_agent_delivery_pay": 23226.0, "total_labor_cost": 46076.0, "total_hold_penalties": 5460.0, "total_return_penalties": 6765.0, "total_penalty_cost": 12225.0, "total_operating_cost": 58301.0, "cost_per_delivered_order": 27.62}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "week_label": "Week 1", "total_delivered": 1631, "total_attempts": 2023, "total_holds": 171, "total_returns": 221, "fixed_agent_pay": 16900.0, "var_agent_daily_pay": 13800.0, "var_agent_delivery_pay": 15386.0, "total_labor_cost": 46086.0, "total_hold_penalties": 5130.0, "total_return_penalties": 12155.0, "total_penalty_cost": 17285.0, "total_operating_cost": 63371.0, "cost_per_delivered_order": 38.85}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "week_label": "Week 2", "total_delivered": 1780, "total_attempts": 2202, "total_holds": 186, "total_returns": 236, "fixed_agent_pay": 17550.0, "var_agent_daily_pay": 14400.0, "var_agent_delivery_pay": 15946.0, "total_labor_cost": 47896.0, "total_hold_penalties": 5580.0, "total_return_penalties": 12980.0, "total_penalty_cost": 18560.0, "total_operating_cost": 66456.0, "cost_per_delivered_order": 37.33}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "week_label": "Week 1", "total_delivered": 1687, "total_attempts": 1870, "total_holds": 124, "total_returns": 59, "fixed_agent_pay": 35100.0, "var_agent_daily_pay": 3900.0, "var_agent_delivery_pay": 4592.0, "total_labor_cost": 43592.0, "total_hold_penalties": 3720.0, "total_return_penalties": 3245.0, "total_penalty_cost": 6965.0, "total_operating_cost": 50557.0, "cost_per_delivered_order": 29.97}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "week_label": "Week 2", "total_delivered": 1794, "total_attempts": 2025, "total_holds": 146, "total_returns": 85, "fixed_agent_pay": 29250.0, "var_agent_daily_pay": 4200.0, "var_agent_delivery_pay": 6062.0, "total_labor_cost": 39512.0, "total_hold_penalties": 4380.0, "total_return_penalties": 4675.0, "total_penalty_cost": 9055.0, "total_operating_cost": 48567.0, "cost_per_delivered_order": 27.07}], "q7": [{"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "week_start": "2026-10-27", "week_end": "2026-11-02", "current_agents": 10, "expected_orders": 2470, "baseline_required_exact": 10.38, "baseline_required_agents": 11, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0733, "forecast_adjusted_attempts": 2651.1, "adjusted_required_exact": 11.14, "adjusted_required_agents": 12, "adjusted_staffing_gap": 2}, {"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "week_start": "2026-11-03", "week_end": "2026-11-09", "current_agents": 10, "expected_orders": 2545, "baseline_required_exact": 10.69, "baseline_required_agents": 11, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0733, "forecast_adjusted_attempts": 2731.5, "adjusted_required_exact": 11.48, "adjusted_required_agents": 12, "adjusted_staffing_gap": 2}, {"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "week_start": "2026-11-10", "week_end": "2026-11-16", "current_agents": 10, "expected_orders": 2570, "baseline_required_exact": 10.8, "baseline_required_agents": 11, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0733, "forecast_adjusted_attempts": 2758.4, "adjusted_required_exact": 11.59, "adjusted_required_agents": 12, "adjusted_staffing_gap": 2}, {"hub_id": "H01", "hub_name": "Greenfield", "cluster": "Cluster A", "week_start": "2026-11-17", "week_end": "2026-11-23", "current_agents": 10, "expected_orders": 2495, "baseline_required_exact": 10.48, "baseline_required_agents": 11, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0733, "forecast_adjusted_attempts": 2677.9, "adjusted_required_exact": 11.25, "adjusted_required_agents": 12, "adjusted_staffing_gap": 2}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "week_start": "2026-10-27", "week_end": "2026-11-02", "current_agents": 11, "expected_orders": 1544, "baseline_required_exact": 6.49, "baseline_required_agents": 7, "baseline_staffing_gap": -4, "attempt_multiplier": 1.0731, "forecast_adjusted_attempts": 1656.9, "adjusted_required_exact": 6.96, "adjusted_required_agents": 7, "adjusted_staffing_gap": -4}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "week_start": "2026-11-03", "week_end": "2026-11-09", "current_agents": 11, "expected_orders": 1591, "baseline_required_exact": 6.68, "baseline_required_agents": 7, "baseline_staffing_gap": -4, "attempt_multiplier": 1.0731, "forecast_adjusted_attempts": 1707.3, "adjusted_required_exact": 7.17, "adjusted_required_agents": 8, "adjusted_staffing_gap": -3}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "week_start": "2026-11-10", "week_end": "2026-11-16", "current_agents": 11, "expected_orders": 1606, "baseline_required_exact": 6.75, "baseline_required_agents": 7, "baseline_staffing_gap": -4, "attempt_multiplier": 1.0731, "forecast_adjusted_attempts": 1723.4, "adjusted_required_exact": 7.24, "adjusted_required_agents": 8, "adjusted_staffing_gap": -3}, {"hub_id": "H02", "hub_name": "Lakeview", "cluster": "Cluster A", "week_start": "2026-11-17", "week_end": "2026-11-23", "current_agents": 11, "expected_orders": 1559, "baseline_required_exact": 6.55, "baseline_required_agents": 7, "baseline_staffing_gap": -4, "attempt_multiplier": 1.0731, "forecast_adjusted_attempts": 1673.0, "adjusted_required_exact": 7.03, "adjusted_required_agents": 8, "adjusted_staffing_gap": -3}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "week_start": "2026-10-27", "week_end": "2026-11-02", "current_agents": 12, "expected_orders": 2170, "baseline_required_exact": 9.12, "baseline_required_agents": 10, "baseline_staffing_gap": -2, "attempt_multiplier": 1.3509, "forecast_adjusted_attempts": 2931.5, "adjusted_required_exact": 12.32, "adjusted_required_agents": 13, "adjusted_staffing_gap": 1}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "week_start": "2026-11-03", "week_end": "2026-11-09", "current_agents": 12, "expected_orders": 2230, "baseline_required_exact": 9.37, "baseline_required_agents": 10, "baseline_staffing_gap": -2, "attempt_multiplier": 1.3509, "forecast_adjusted_attempts": 3012.5, "adjusted_required_exact": 12.66, "adjusted_required_agents": 13, "adjusted_staffing_gap": 1}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "week_start": "2026-11-10", "week_end": "2026-11-16", "current_agents": 12, "expected_orders": 2245, "baseline_required_exact": 9.43, "baseline_required_agents": 10, "baseline_staffing_gap": -2, "attempt_multiplier": 1.3509, "forecast_adjusted_attempts": 3032.8, "adjusted_required_exact": 12.74, "adjusted_required_agents": 13, "adjusted_staffing_gap": 1}, {"hub_id": "H03", "hub_name": "Riverside", "cluster": "Cluster B", "week_start": "2026-11-17", "week_end": "2026-11-23", "current_agents": 12, "expected_orders": 2200, "baseline_required_exact": 9.24, "baseline_required_agents": 10, "baseline_staffing_gap": -2, "attempt_multiplier": 1.3509, "forecast_adjusted_attempts": 2972.0, "adjusted_required_exact": 12.49, "adjusted_required_agents": 13, "adjusted_staffing_gap": 1}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "week_start": "2026-10-27", "week_end": "2026-11-02", "current_agents": 9, "expected_orders": 2264, "baseline_required_exact": 9.51, "baseline_required_agents": 10, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0776, "forecast_adjusted_attempts": 2439.7, "adjusted_required_exact": 10.25, "adjusted_required_agents": 11, "adjusted_staffing_gap": 2}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "week_start": "2026-11-03", "week_end": "2026-11-09", "current_agents": 9, "expected_orders": 2333, "baseline_required_exact": 9.8, "baseline_required_agents": 10, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0776, "forecast_adjusted_attempts": 2514.0, "adjusted_required_exact": 10.56, "adjusted_required_agents": 11, "adjusted_staffing_gap": 2}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "week_start": "2026-11-10", "week_end": "2026-11-16", "current_agents": 9, "expected_orders": 2356, "baseline_required_exact": 9.9, "baseline_required_agents": 10, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0776, "forecast_adjusted_attempts": 2538.8, "adjusted_required_exact": 10.67, "adjusted_required_agents": 11, "adjusted_staffing_gap": 2}, {"hub_id": "H04", "hub_name": "Hillcrest", "cluster": "Cluster B", "week_start": "2026-11-17", "week_end": "2026-11-23", "current_agents": 9, "expected_orders": 2287, "baseline_required_exact": 9.61, "baseline_required_agents": 10, "baseline_staffing_gap": 1, "attempt_multiplier": 1.0776, "forecast_adjusted_attempts": 2464.5, "adjusted_required_exact": 10.35, "adjusted_required_agents": 11, "adjusted_staffing_gap": 2}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "week_start": "2026-10-27", "week_end": "2026-11-02", "current_agents": 11, "expected_orders": 1955, "baseline_required_exact": 8.21, "baseline_required_agents": 9, "baseline_staffing_gap": -2, "attempt_multiplier": 1.0847, "forecast_adjusted_attempts": 2120.6, "adjusted_required_exact": 8.91, "adjusted_required_agents": 9, "adjusted_staffing_gap": -2}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "week_start": "2026-11-03", "week_end": "2026-11-09", "current_agents": 11, "expected_orders": 2015, "baseline_required_exact": 8.47, "baseline_required_agents": 9, "baseline_staffing_gap": -2, "attempt_multiplier": 1.0847, "forecast_adjusted_attempts": 2185.7, "adjusted_required_exact": 9.18, "adjusted_required_agents": 10, "adjusted_staffing_gap": -1}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "week_start": "2026-11-10", "week_end": "2026-11-16", "current_agents": 11, "expected_orders": 2035, "baseline_required_exact": 8.55, "baseline_required_agents": 9, "baseline_staffing_gap": -2, "attempt_multiplier": 1.0847, "forecast_adjusted_attempts": 2207.4, "adjusted_required_exact": 9.27, "adjusted_required_agents": 10, "adjusted_staffing_gap": -1}, {"hub_id": "H05", "hub_name": "Brookside", "cluster": "Cluster C", "week_start": "2026-11-17", "week_end": "2026-11-23", "current_agents": 11, "expected_orders": 1975, "baseline_required_exact": 8.3, "baseline_required_agents": 9, "baseline_staffing_gap": -2, "attempt_multiplier": 1.0847, "forecast_adjusted_attempts": 2142.3, "adjusted_required_exact": 9.0, "adjusted_required_agents": 10, "adjusted_staffing_gap": -1}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "week_start": "2026-10-27", "week_end": "2026-11-02", "current_agents": 9, "expected_orders": 1852, "baseline_required_exact": 7.78, "baseline_required_agents": 8, "baseline_staffing_gap": -1, "attempt_multiplier": 1.0674, "forecast_adjusted_attempts": 1976.8, "adjusted_required_exact": 8.31, "adjusted_required_agents": 9, "adjusted_staffing_gap": 0}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "week_start": "2026-11-03", "week_end": "2026-11-09", "current_agents": 9, "expected_orders": 1909, "baseline_required_exact": 8.02, "baseline_required_agents": 9, "baseline_staffing_gap": 0, "attempt_multiplier": 1.0674, "forecast_adjusted_attempts": 2037.7, "adjusted_required_exact": 8.56, "adjusted_required_agents": 9, "adjusted_staffing_gap": 0}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "week_start": "2026-11-10", "week_end": "2026-11-16", "current_agents": 9, "expected_orders": 1928, "baseline_required_exact": 8.1, "baseline_required_agents": 9, "baseline_staffing_gap": 0, "attempt_multiplier": 1.0674, "forecast_adjusted_attempts": 2057.9, "adjusted_required_exact": 8.65, "adjusted_required_agents": 9, "adjusted_staffing_gap": 0}, {"hub_id": "H06", "hub_name": "Westwood", "cluster": "Cluster C", "week_start": "2026-11-17", "week_end": "2026-11-23", "current_agents": 9, "expected_orders": 1871, "baseline_required_exact": 7.86, "baseline_required_agents": 8, "baseline_staffing_gap": -1, "attempt_multiplier": 1.0674, "forecast_adjusted_attempts": 1997.1, "adjusted_required_exact": 8.39, "adjusted_required_agents": 9, "adjusted_staffing_gap": 0}], "q9": [{"Item": "Internal Transfer: Lakeview (H02) to Greenfield (H01)", "Category": "One-Time Cost", "Units": "2 Agents", "Unit_Cost_BDT": 2000, "Total_Cost_BDT": 4000, "Notes": "Cluster A intra-cluster move; donor util 56.17% < 75%"}, {"Item": "Hold Reduction Programme at Riverside (H03)", "Category": "One-Time Cost", "Units": "1 Hub", "Unit_Cost_BDT": 15000, "Total_Cost_BDT": 15000, "Notes": "Removes 50% agent-side holds (282 holds/wk); 14-day ramp"}, {"Item": "New Agent Recruitment & Onboarding (H04)", "Category": "One-Time Cost", "Units": "2 Agents", "Unit_Cost_BDT": 5000, "Total_Cost_BDT": 10000, "Notes": "Hillcrest capacity expansion; 60% speed in first 7 days"}, {"Item": "Fixed Agent Monthly Salary (1 Agent at H04)", "Category": "Monthly Salary", "Units": "1 Agent", "Unit_Cost_BDT": 16900, "Total_Cost_BDT": 16900, "Notes": "Guaranteed core capacity at Hillcrest"}, {"Item": "Variable Agent Monthly Pay (1 Agent at H04)", "Category": "Monthly Salary", "Units": "1 Agent", "Unit_Cost_BDT": 19798, "Total_Cost_BDT": 19798, "Notes": "BDT 300/day base + BDT 14/delivery (~857 deliveries)"}, {"Item": "Operational Contingency Reserve", "Category": "Contingency", "Units": "Reserve", "Unit_Cost_BDT": 4302, "Total_Cost_BDT": 4302, "Notes": "Unallocated buffer for dynamic volume surges"}, {"Item": "TOTAL ALLOCATED BUDGET", "Category": "Total Budget", "Units": "-", "Unit_Cost_BDT": 0, "Total_Cost_BDT": 70000, "Notes": "Strictly within BDT 70,000 Finance limit"}], "q10": [{"Risk_Area": "Hold Programme Ramp-Up Lag", "Specific_Risk": "14-day delay to reach 50% reduction in agent-side holds at H03 leads to severe Week 1-2 backlog.", "Monitored_Metric": "Daily agent-side hold count at H03 (Late Dispatch + Not Attempted + Time Shortage).", "W1_Warning_Threshold": "> 55 agent-side holds/day (baseline was ~80/day).", "W2_Warning_Threshold": "> 40 agent-side holds/day (should be approaching 50% cut).", "Triggered_Mitigation": "Activate temporary variable overtime from Cluster C surplus or dispatch supervisors to enforce 08:00 AM route departure."}, {"Risk_Area": "New Hire Ramp-Up Speed", "Specific_Risk": "New agents at H04 fail to achieve 60% speed in Week 1 (24 attempts/day) or 100% in Week 2.", "Monitored_Metric": "Daily attempts completed by new agents at H04.", "W1_Warning_Threshold": "< 20 attempts/day per new agent.", "W2_Warning_Threshold": "< 32 attempts/day per new agent.", "Triggered_Mitigation": "Pair new recruits with top senior performer (Zaron Calloran, 30.9 deliveries/day) for shadow routing."}, {"Risk_Area": "Cluster A Transfer Friction", "Specific_Risk": "Transferred agents from H02 experience route unfamiliarity at H01, causing delivery drops.", "Monitored_Metric": "Deliveries per working day for transferred agents at H01.", "W1_Warning_Threshold": "< 22 deliveries/day (H01 historical average is 27.1).", "W2_Warning_Threshold": "< 25 deliveries/day.", "Triggered_Mitigation": "Reassign transferred agents to high-density, centralized zones in Greenfield and provide pre-mapped routes."}, {"Risk_Area": "Senior Return Rate Inertia", "Specific_Risk": "Senior agents at H05 (A1045, A1046, A1047) continue returning 20-27% of assigned orders.", "Monitored_Metric": "Weekly return ratio of agents A1045, A1046, and A1047.", "W1_Warning_Threshold": "Return ratio > 12.0% (historical was 17-27%).", "W2_Warning_Threshold": "Return ratio > 8.0%.", "Triggered_Mitigation": "Enforce mandatory customer call verification before logging Return status; reassign failing routes to supervisor audit."}, {"Risk_Area": "Customer-Side Hold Surge", "Specific_Risk": "External customer unavailability surges beyond historical 20-25%, overwhelming daily delivery slots.", "Monitored_Metric": "Customer-side hold share % (Unreachable + Rescheduled) across all hubs.", "W1_Warning_Threshold": "> 25% of total assigned orders.", "W2_Warning_Threshold": "> 25% of total assigned orders.", "Triggered_Mitigation": "Implement automated SMS pre-arrival notifications and customer delivery window selection."}], "w2_hold_breakdown": [{"hub_id": "H01", "hub_name": "Greenfield", "hold_reason": "Customer Unreachable", "cnt": 73}, {"hub_id": "H01", "hub_name": "Greenfield", "hold_reason": "Customer Rescheduled", "cnt": 35}, {"hub_id": "H01", "hub_name": "Greenfield", "hold_reason": "Address Incomplete", "cnt": 28}, {"hub_id": "H01", "hub_name": "Greenfield", "hold_reason": "Agent Time Shortage", "cnt": 13}, {"hub_id": "H01", "hub_name": "Greenfield", "hold_reason": "Not Attempted", "cnt": 11}, {"hub_id": "H01", "hub_name": "Greenfield", "hold_reason": "Late Dispatch", "cnt": 8}, {"hub_id": "H02", "hub_name": "Lakeview", "hold_reason": "Customer Unreachable", "cnt": 50}, {"hub_id": "H02", "hub_name": "Lakeview", "hold_reason": "Customer Rescheduled", "cnt": 25}, {"hub_id": "H02", "hub_name": "Lakeview", "hold_reason": "Address Incomplete", "cnt": 22}, {"hub_id": "H02", "hub_name": "Lakeview", "hold_reason": "Agent Time Shortage", "cnt": 10}, {"hub_id": "H02", "hub_name": "Lakeview", "hold_reason": "Not Attempted", "cnt": 9}, {"hub_id": "H02", "hub_name": "Lakeview", "hold_reason": "Late Dispatch", "cnt": 7}, {"hub_id": "H03", "hub_name": "Riverside", "hold_reason": "Late Dispatch", "cnt": 312}, {"hub_id": "H03", "hub_name": "Riverside", "hold_reason": "Customer Unreachable", "cnt": 156}, {"hub_id": "H03", "hub_name": "Riverside", "hold_reason": "Not Attempted", "cnt": 132}, {"hub_id": "H03", "hub_name": "Riverside", "hold_reason": "Agent Time Shortage", "cnt": 119}, {"hub_id": "H03", "hub_name": "Riverside", "hold_reason": "Customer Rescheduled", "cnt": 92}, {"hub_id": "H03", "hub_name": "Riverside", "hold_reason": "Address Incomplete", "cnt": 63}, {"hub_id": "H04", "hub_name": "Hillcrest", "hold_reason": "Customer Unreachable", "cnt": 77}, {"hub_id": "H04", "hub_name": "Hillcrest", "hold_reason": "Customer Rescheduled", "cnt": 39}, {"hub_id": "H04", "hub_name": "Hillcrest", "hold_reason": "Address Incomplete", "cnt": 26}, {"hub_id": "H04", "hub_name": "Hillcrest", "hold_reason": "Late Dispatch", "cnt": 20}, {"hub_id": "H04", "hub_name": "Hillcrest", "hold_reason": "Agent Time Shortage", "cnt": 10}, {"hub_id": "H04", "hub_name": "Hillcrest", "hold_reason": "Not Attempted", "cnt": 10}, {"hub_id": "H05", "hub_name": "Brookside", "hold_reason": "Customer Unreachable", "cnt": 68}, {"hub_id": "H05", "hub_name": "Brookside", "hold_reason": "Customer Rescheduled", "cnt": 43}, {"hub_id": "H05", "hub_name": "Brookside", "hold_reason": "Address Incomplete", "cnt": 26}, {"hub_id": "H05", "hub_name": "Brookside", "hold_reason": "Late Dispatch", "cnt": 17}, {"hub_id": "H05", "hub_name": "Brookside", "hold_reason": "Agent Time Shortage", "cnt": 16}, {"hub_id": "H05", "hub_name": "Brookside", "hold_reason": "Not Attempted", "cnt": 16}, {"hub_id": "H06", "hub_name": "Westwood", "hold_reason": "Customer Unreachable", "cnt": 66}, {"hub_id": "H06", "hub_name": "Westwood", "hold_reason": "Customer Rescheduled", "cnt": 28}, {"hub_id": "H06", "hub_name": "Westwood", "hold_reason": "Address Incomplete", "cnt": 22}, {"hub_id": "H06", "hub_name": "Westwood", "hold_reason": "Agent Time Shortage", "cnt": 13}, {"hub_id": "H06", "hub_name": "Westwood", "hold_reason": "Late Dispatch", "cnt": 10}, {"hub_id": "H06", "hub_name": "Westwood", "hold_reason": "Not Attempted", "cnt": 7}], "city_totals": {"total_orders": 22789, "total_delivered": 21078, "total_holds": 3042, "total_returns": 1475, "total_attempts": 25595, "overall_delivery_rate": 92.49, "avg_cost_per_order": 34.87, "overloaded_hubs": ["H01 (Greenfield)", "H03 (Riverside)", "H04 (Hillcrest)"], "donor_hubs": ["H02 (Lakeview)", "H05 (Brookside)"]}};
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('tab-inactive');
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('tab-inactive');
+        activeBtn.classList.add('tab-active');
+      }
+    }
+
+    // Initial render on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderQ6Table();
+      renderQ2Table();
+      renderQ7Table();
+      renderQ5Table();
+      renderQ9Table();
+      renderQ10Table();
+      initCharts();
+    });
+
+    function renderQ6Table() {
+      const tbody = document.getElementById('table-q6-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      DASHBOARD_DATA.q6.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-white">${r.hub_name} <span class="text-slate-400 font-normal">(${r.hub_id})</span></td>
+          <td class="p-3">${r.week_label}</td>
+          <td class="p-3 text-right text-emerald-400 font-medium">${r.total_delivered.toLocaleString()}</td>
+          <td class="p-3 text-right">${r.total_attempts.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono">BDT ${r.fixed_agent_pay.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono">BDT ${(r.var_agent_daily_pay + r.var_agent_delivery_pay).toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-medium">BDT ${r.total_labor_cost.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono text-amber-400">BDT ${r.total_hold_penalties.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono text-rose-400">BDT ${r.total_return_penalties.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-bold text-white">BDT ${r.total_operating_cost.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-bold text-indigo-400 text-sm">BDT ${r.cost_per_delivered_order.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderQ2Table() {
+      const tbody = document.getElementById('table-q2-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      DASHBOARD_DATA.q2.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        let badge = '';
+        if (r.w2_planned_utilisation > 0.85) {
+          badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold badge-overload">OVERLOADED (>85%)</span>';
+        } else if (r.w2_planned_utilisation < 0.75) {
+          badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold badge-donor">ELIGIBLE DONOR (<75%)</span>';
+        } else {
+          badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold badge-balanced">BALANCED</span>';
+        }
+
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-white">${r.hub_name} <span class="text-slate-400 font-normal">(${r.hub_id})</span></td>
+          <td class="p-3">${r.cluster}</td>
+          <td class="p-3 text-center">${r.w1_available_agents}</td>
+          <td class="p-3 text-right font-mono">${r.w1_total_attempts.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-medium text-slate-300">${(r.w1_planned_utilisation * 100).toFixed(1)}%</td>
+          <td class="p-3 text-center">${r.w2_available_agents}</td>
+          <td class="p-3 text-right font-mono">${r.w2_total_attempts.toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-bold ${r.w2_planned_utilisation > 0.85 ? 'text-rose-400 text-sm' : (r.w2_planned_utilisation < 0.75 ? 'text-emerald-400' : 'text-blue-400')}">
+            ${(r.w2_planned_utilisation * 100).toFixed(1)}%
+          </td>
+          <td class="p-3 text-center">${badge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderQ7Table() {
+      const tbody = document.getElementById('table-q7-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      DASHBOARD_DATA.q7.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        const gapColor = r.adjusted_staffing_gap > 0 ? 'text-rose-400 font-bold' : (r.adjusted_staffing_gap < 0 ? 'text-emerald-400' : 'text-slate-400');
+        const gapSign = r.adjusted_staffing_gap > 0 ? '+' : '';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-white">${r.hub_name} <span class="text-slate-400 font-normal">(${r.hub_id})</span></td>
+          <td class="p-3 font-mono text-[11px]">${r.week_start} to ${r.week_end}</td>
+          <td class="p-3 text-center font-bold text-white">${r.current_agents}</td>
+          <td class="p-3 text-right font-mono">${r.expected_orders.toLocaleString()}</td>
+          <td class="p-3 text-center font-mono">${r.baseline_required_agents}</td>
+          <td class="p-3 text-center font-mono">${r.baseline_staffing_gap > 0 ? '+' + r.baseline_staffing_gap : r.baseline_staffing_gap}</td>
+          <td class="p-3 text-center font-mono text-indigo-300">${r.attempt_multiplier.toFixed(4)}x</td>
+          <td class="p-3 text-right font-mono text-slate-200">${Math.round(r.forecast_adjusted_attempts).toLocaleString()}</td>
+          <td class="p-3 text-center font-mono font-semibold text-white">${r.adjusted_required_agents}</td>
+          <td class="p-3 text-center font-mono text-sm ${gapColor}">${gapSign}${r.adjusted_staffing_gap}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderQ5Table() {
+      const tbody = document.getElementById('table-q5-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      DASHBOARD_DATA.q5.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-indigo-400">${r.agent_id}</td>
+          <td class="p-3 font-medium text-white">${r.agent_name}</td>
+          <td class="p-3">${r.hub_name} (${r.hub_id})</td>
+          <td class="p-3 font-mono text-[11px]">${r.joining_date}</td>
+          <td class="p-3 text-center font-mono">${r.tenure_days}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] ${r.salary_type === 'Fixed' ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'}">${r.salary_type}</span></td>
+          <td class="p-3 text-right font-mono">${r.assigned_attempts}</td>
+          <td class="p-3 text-right font-mono text-emerald-400">${r.delivered_orders}</td>
+          <td class="p-3 text-right font-mono text-amber-400">${r.hold_orders}</td>
+          <td class="p-3 text-right font-mono font-bold text-rose-400">${r.returned_orders}</td>
+          <td class="p-3 text-right font-mono font-bold text-rose-400 text-sm">${r.return_ratio_pct.toFixed(2)}%</td>
+          <td class="p-3 text-[11px] text-slate-300">Mandatory customer call audit before logging Return; route quality retraining.</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderQ9Table() {
+      const tbody = document.getElementById('table-q9-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      DASHBOARD_DATA.q9.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        const isTotal = r.Category === 'Total Budget';
+        tr.innerHTML = `
+          <td class="p-3 font-medium ${isTotal ? 'font-bold text-white text-sm' : 'text-slate-200'}">${r.Item}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">${r.Category}</span></td>
+          <td class="p-3 text-center">${r.Units}</td>
+          <td class="p-3 text-right font-mono">${r.Unit_Cost_BDT > 0 ? 'BDT ' + r.Unit_Cost_BDT.toLocaleString() : '-'}</td>
+          <td class="p-3 text-right font-mono font-bold ${isTotal ? 'text-emerald-400 text-sm' : 'text-white'}">BDT ${r.Total_Cost_BDT.toLocaleString()}</td>
+          <td class="p-3 text-[11px] text-slate-400">${r.Notes}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderQ10Table() {
+      const tbody = document.getElementById('table-q10-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      DASHBOARD_DATA.q10.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-white">${r.Risk_Area}</td>
+          <td class="p-3 text-slate-300 text-[11px]">${r.Specific_Risk}</td>
+          <td class="p-3 text-indigo-300 font-medium text-[11px]">${r.Monitored_Metric}</td>
+          <td class="p-3 text-amber-400 font-mono text-[11px] font-semibold">${r.W1_Warning_Threshold}</td>
+          <td class="p-3 text-rose-400 font-mono text-[11px] font-semibold">${r.W2_Warning_Threshold}</td>
+          <td class="p-3 text-slate-300 text-[11px]">${r.Triggered_Mitigation}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function initCharts() {
+      Chart.defaults.color = '#94A3B8';
+      Chart.defaults.font.family = "'Inter', sans-serif";
+
+      const hubs = [...new Set(DASHBOARD_DATA.q2.map(x => x.hub_name))];
+
+      // 1. Attempts Growth Chart
+      const elAttempts = document.getElementById('chart-attempts-growth');
+      if (elAttempts) {
+        const w1Attempts = DASHBOARD_DATA.q2.map(x => x.w1_total_attempts);
+        const w2Attempts = DASHBOARD_DATA.q2.map(x => x.w2_total_attempts);
+        new Chart(elAttempts, {
+          type: 'bar',
+          data: {
+            labels: hubs,
+            datasets: [
+              { label: 'Week 1 Attempts', data: w1Attempts, backgroundColor: '#3B82F6' },
+              { label: 'Week 2 Attempts', data: w2Attempts, backgroundColor: '#EC4899' }
+            ]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              y: { grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // 2. Unit Cost Chart
+      const elUnitCost = document.getElementById('chart-unit-cost');
+      if (elUnitCost) {
+        const w1Costs = DASHBOARD_DATA.q6.filter(x => x.week_label === 'Week 1').map(x => x.cost_per_delivered_order);
+        const w2Costs = DASHBOARD_DATA.q6.filter(x => x.week_label === 'Week 2').map(x => x.cost_per_delivered_order);
+        new Chart(elUnitCost, {
+          type: 'line',
+          data: {
+            labels: hubs,
+            datasets: [
+              { label: 'Week 1 Cost (BDT)', data: w1Costs, borderColor: '#60A5FA', backgroundColor: 'rgba(96, 165, 250, 0.1)', tension: 0.3, fill: true },
+              { label: 'Week 2 Cost (BDT)', data: w2Costs, borderColor: '#F43F5E', backgroundColor: 'rgba(244, 63, 94, 0.1)', tension: 0.3, fill: true }
+            ]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, min: 20 },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // 3. Forecast Gaps Chart
+      const elForecast = document.getElementById('chart-forecast-gaps');
+      if (elForecast) {
+        const peakGapsByHub = [];
+        const activeStaffByHub = [];
+        hubs.forEach(hName => {
+          const rows = DASHBOARD_DATA.q7.filter(x => x.hub_name === hName);
+          peakGapsByHub.push(Math.max(...rows.map(x => x.adjusted_staffing_gap)));
+          activeStaffByHub.push(rows[0].current_agents);
+        });
+        new Chart(elForecast, {
+          type: 'bar',
+          data: {
+            labels: hubs,
+            datasets: [
+              { label: 'Current Active Staff', data: activeStaffByHub, backgroundColor: '#4F46E5' },
+              { label: 'Peak Staffing Gap (Adj.)', data: peakGapsByHub, backgroundColor: peakGapsByHub.map(g => g > 0 ? '#EF4444' : '#10B981') }
+            ]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              y: { grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // 4. Hold Reasons Breakdown Chart
+      const elHoldsCat = document.getElementById('chart-holds-category');
+      if (elHoldsCat) {
+        const agentHolds = DASHBOARD_DATA.q3.map(x => x.agent_side_holds);
+        const customerHolds = DASHBOARD_DATA.q3.map(x => x.customer_side_holds);
+        new Chart(elHoldsCat, {
+          type: 'bar',
+          data: {
+            labels: hubs,
+            datasets: [
+              { label: 'Agent-Side Holds (Avoidable)', data: agentHolds, backgroundColor: '#EF4444' },
+              { label: 'Customer-Side Holds (External)', data: customerHolds, backgroundColor: '#3B82F6' }
+            ]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              x: { stacked: true, grid: { display: false } },
+              y: { stacked: true, grid: { color: 'rgba(255, 255, 255, 0.05)' } }
+            }
+          }
+        });
+      }
+
+      // 5. Held Orders Funnel Chart
+      const elFunnel = document.getElementById('chart-held-funnel');
+      if (elFunnel) {
+        new Chart(elFunnel, {
+          type: 'doughnut',
+          data: {
+            labels: ['Finally Delivered (81.5%)', 'Finally Returned (9.4%)', 'Still on Hold (9.1%)'],
+            datasets: [{
+              data: [2118, 245, 236],
+              backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+      }
+
+      // 6. Agent Productivity Chart
+      const elProd = document.getElementById('chart-agent-prod');
+      if (elProd) {
+        const workingAvg = DASHBOARD_DATA.q1_hub.map(x => x.avg_deliveries_per_working_day);
+        const availableAvg = DASHBOARD_DATA.q1_hub.map(x => x.avg_deliveries_per_available_day);
+        new Chart(elProd, {
+          type: 'bar',
+          data: {
+            labels: hubs,
+            datasets: [
+              { label: 'Deliveries / Working Agent-Day', data: workingAvg, backgroundColor: '#6366F1' },
+              { label: 'Deliveries / Available Scheduled Day', data: availableAvg, backgroundColor: '#94A3B8' }
+            ]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, min: 15 },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // 7. Budget Donut Chart
+      const elBudget = document.getElementById('chart-budget-donut');
+      if (elBudget) {
+        new Chart(elBudget, {
+          type: 'doughnut',
+          data: {
+            labels: ['Cluster Transfers (4k)', 'Hold Prog H03 (15k)', 'New Hire Fees (10k)', 'New Hire Salaries (36.7k)', 'Reserve Buffer (4.3k)'],
+            datasets: [{
+              data: [4000, 15000, 10000, 36698, 4302],
+              backgroundColor: ['#3B82F6', '#F59E0B', '#EC4899', '#8B5CF6', '#10B981'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+          }
+        });
+      }
+
+    }
+  </script>
+</body>
+</html>

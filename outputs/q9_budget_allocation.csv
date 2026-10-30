@@ -1,0 +1,8 @@
+Item,Category,Units,Unit_Cost_BDT,Total_Cost_BDT,Notes
+Internal Transfer: Lakeview (H02) to Greenfield (H01),One-Time Cost,2 Agents,2000,4000,Cluster A intra-cluster move; donor util 56.17% < 75%
+Hold Reduction Programme at Riverside (H03),One-Time Cost,1 Hub,15000,15000,Removes 50% agent-side holds (282 holds/wk); 14-day ramp
+New Agent Recruitment & Onboarding (H04),One-Time Cost,2 Agents,5000,10000,Hillcrest capacity expansion; 60% speed in first 7 days
+Fixed Agent Monthly Salary (1 Agent at H04),Monthly Salary,1 Agent,16900,16900,Guaranteed core capacity at Hillcrest
+Variable Agent Monthly Pay (1 Agent at H04),Monthly Salary,1 Agent,19798,19798,BDT 300/day base + BDT 14/delivery (~857 deliveries)
+Operational Contingency Reserve,Contingency,Reserve,4302,4302,Unallocated buffer for dynamic volume surges
+TOTAL ALLOCATED BUDGET,Total Budget,-,0,70000,"Strictly within BDT 70,000 Finance limit"

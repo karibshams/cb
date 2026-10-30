@@ -1,0 +1,7 @@
+hub_id,hub_name,cluster,w1_available_agents,w1_working_days,w1_total_attempts,w1_planned_utilisation,w1_worked_utilisation,w2_available_agents,w2_working_days,w2_total_attempts,w2_planned_utilisation,w2_worked_utilisation,attempt_growth_pct,w2_over_target_flag
+H01,Greenfield,Cluster A,11,75,1925,0.625,0.6417,10,69,2482,0.8864,0.8993,28.94,YES (Overloaded > 85%)
+H02,Lakeview,Cluster A,11,74,1647,0.5347,0.5564,11,75,1730,0.5617,0.5767,5.04,NO (Within Target)
+H03,Riverside,Cluster B,12,83,2281,0.6789,0.687,12,82,3051,0.908,0.9302,33.76,YES (Overloaded > 85%)
+H04,Hillcrest,Cluster B,9,62,1943,0.771,0.7835,9,61,2416,0.9587,0.9902,24.34,YES (Overloaded > 85%)
+H05,Brookside,Cluster C,11,72,2023,0.6568,0.7024,11,75,2202,0.7149,0.734,8.85,NO (Within Target)
+H06,Westwood,Cluster C,10,67,1870,0.6679,0.6978,9,59,2025,0.8036,0.8581,8.29,NO (Within Target)

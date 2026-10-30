@@ -1,0 +1,21 @@
+work_date,agent_id,agent_name,hub_id,hub_name,cluster,salary_type,active_status,assigned_attempts,delivered_orders,hold_orders,returned_orders
+2026-10-13,A1001,Weno Tremaine,H01,Greenfield,Cluster A,Variable,Active,20,18,2,0
+2026-10-13,A1002,Valel Wexley,H01,Greenfield,Cluster A,Fixed,Active,21,17,4,0
+2026-10-13,A1003,Torian Vantell,H01,Greenfield,Cluster A,Fixed,Active,27,22,3,2
+2026-10-13,A1004,Garian Larkin,H01,Greenfield,Cluster A,Variable,Active,20,19,1,0
+2026-10-13,A1005,Wenan Brannick,H01,Greenfield,Cluster A,Fixed,Active,23,20,2,1
+2026-10-13,A1006,Toren Rowntree,H01,Greenfield,Cluster A,Fixed,Active,26,23,2,1
+2026-10-13,A1007,Coris Rowntree,H01,Greenfield,Cluster A,Fixed,Active,27,25,0,2
+2026-10-13,A1008,Garon Holloway,H01,Greenfield,Cluster A,Variable,Active,26,22,3,1
+2026-10-13,A1009,Perian Halvorsen,H01,Greenfield,Cluster A,Variable,Active,34,27,6,1
+2026-10-13,A1010,Joris Fenwick,H01,Greenfield,Cluster A,Fixed,Active,28,23,2,3
+2026-10-13,A1011,Marel Fenwick,H01,Greenfield,Cluster A,Fixed,Inactive,14,12,1,1
+2026-10-13,A1012,Zarik Rowntree,H02,Lakeview,Cluster A,Fixed,Active,19,18,1,0
+2026-10-13,A1013,Pero Ketteridge,H02,Lakeview,Cluster A,Fixed,Active,25,22,2,1
+2026-10-13,A1014,Zaris Quorne,H02,Lakeview,Cluster A,Fixed,Active,26,23,2,1
+2026-10-13,A1015,Toren Larkin,H02,Lakeview,Cluster A,Fixed,Active,24,21,3,0
+2026-10-13,A1016,Noren Vantell,H02,Lakeview,Cluster A,Fixed,Active,17,15,0,2
+2026-10-13,A1017,Joran Pelham,H02,Lakeview,Cluster A,Variable,Active,23,23,0,0
+2026-10-13,A1018,Lorus Brannick,H02,Lakeview,Cluster A,Fixed,Active,14,13,1,0
+2026-10-13,A1019,Selus Rowntree,H02,Lakeview,Cluster A,Fixed,Active,19,17,2,0
+2026-10-13,A1020,Noris Fenwick,H02,Lakeview,Cluster A,Variable,Active,15,14,1,0

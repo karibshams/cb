@@ -1,0 +1,4 @@
+agent_id,agent_name,hub_id,hub_name,cluster,joining_date,tenure_days,salary_type,active_status,assigned_attempts,delivered_orders,hold_orders,returned_orders,return_ratio_pct,return_ratio_completed_pct
+A1045,Belis Rowntree,H05,Brookside,Cluster C,2025-07-20,463,Variable,Active,349,231,24,94,26.93,28.92
+A1046,Coris Halvorsen,H05,Brookside,Cluster C,2025-01-17,647,Fixed,Active,414,295,28,91,21.98,23.58
+A1047,Wenian Vantell,H05,Brookside,Cluster C,2025-05-18,526,Variable,Active,413,301,40,72,17.43,19.3

@@ -1,0 +1,27 @@
+# Exclude local scripts, database, and internal files
+*.py
+*.db
+scripts/
+data/
+screenshots/
+__pycache__/
+Final_Submission_Editable.docx
+Final_Submission_Editable.md
+task1_queries.sql
+/index.html
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# Temporary build artifacts
+~$*
+*.tmp
+*.log
+final_report.html
+presentation_deck.html
